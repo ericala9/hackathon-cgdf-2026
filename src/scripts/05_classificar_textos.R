@@ -142,15 +142,19 @@ if (any(hits_nasc)) {
 # -------------------------- Mascaramento de números --------------------------- 
 
 # Para evitar falsos positivos, números de processos, protocolos, leis, decretos
-# e afins, além de datas, são mascarados neste ponto. Por este motivo as datas
-# de nascimento foram detectadas no passo anterior.
+# e afins, além de datas e anos do século 20 e 21 e CNPJ, são mascarados neste
+# ponto. Por este motivo as datas de nascimento foram detectadas no passo
+# anterior.
 
 mascarar_numeracoes <- function(txt) {
   txt |>
     str_replace_all("\\b\\d{1,2}[./-]\\d{1,2}[./-]\\d{2,4}\\b", "XXXXX") |> 
-    str_replace_all("\\b\\d{5}-\\d{8}/\\d{4}-\\d{2}\\b", "XXXXX") |>  
-    str_replace_all("(?i)(Lei|Decreto|Port|Instr|Ofício)[^\\d]{1,20}\\d+", "XXXXX") |> 
-    str_replace_all("(?i)(protoc|processo|atend|chamado)[^\\d]{1,15}\\d{4,}", "XXXXX") 
+    str_replace_all("\\b\\d{5}-\\d{8}/\\d{4}-\\d{2}\\b", "XXXXX") |>
+    str_replace_all("\\b(19|20)\\d{2}[-/](19|20)\\d{2}\\b", "XXXXX") |>
+    str_replace_all("\\b(19|20)\\d{2}\\b", "XXXXX") |>
+    str_replace_all("\\b\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}\\b", "XXXXX") |>
+    str_replace_all("(?i)(\\bLei|Decreto|\\bPort|\\bInstr|Ofício)[^\\d]{1,20}\\d+", "XXXXX") |> 
+    str_replace_all("(?i)(protoc|processo|atend|chamado|contrato|contratos)[^\\d]{1,15}\\d{4,}", "XXXXX") 
 }
 
 if (any(mask)) {

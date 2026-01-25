@@ -83,7 +83,7 @@ detectar_email <- function(texto) {
       # Passo C: Lista de indicativos de e-mail institucional
       email_institucional = str_detect(
         usuario_limpo, 
-        regex("^(contato|sac|ouvidoria|suporte|atendimento|faleconosco|financeiro|adm|administrativo|geral|info|imprensa|comunicacao|naoresponda|noreply|no-reply|gabinete|protocolo|secretaria|agenda|coord|diretoria)$", ignore_case = TRUE)
+        regex("^(contato|sac|ouvidoria|ouvidoria\\.responde|suporte|atendimento|faleconosco|financeiro|adm|administrativo|geral|info|imprensa|comunicacao|naoresponda|noreply|no-reply|gabinete|protocolo|secretaria|agenda|coord|diretoria)$", ignore_case = TRUE)
       ),
       
       email_classificado = !is.na(bruto) & !email_institucional
