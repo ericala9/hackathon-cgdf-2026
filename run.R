@@ -8,8 +8,11 @@
 # ==============================================================================
 
 # ==============================================================================
-# INSTRUÇÕES: Salve o arquivo em formato .xlsx com os textos a serem
-# classificados na pasta dados/entrada.
+# INSTRUÇÕES DE EXECUÇÃO:
+# 📂 1. Verifique se o arquivo .xlsx com textos a serem classificados está na
+# pasta: 'dados/entrada'
+# ▶️ 2. Para rodar, clique no botão 'Source' (acima à direita) ou use o atalho:
+#          [ Ctrl + Shift + S ]
 # ==============================================================================
 
 # ---------------------------- Configuração inicial ----------------------------
