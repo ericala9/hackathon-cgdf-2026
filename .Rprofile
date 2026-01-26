@@ -1,31 +1,33 @@
-# .Rprofile - Configuração Automática de Inicialização
-
-# 1. Ativa o renv
 source("renv/activate.R")
 
-# 2. Configura o espelho do CRAN
+# Configuração de espelho do CRAN
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 
-# 3. Gatilho de Interface
 setHook("rstudio.sessionInit", function(newSession) {
   
   if (newSession && file.exists("run.R")) {
     
     # Mensagem de boas-vindas
     cat("\033[1;34m") # Azul
-    cat("\n==============================================================\n")
-    cat(" 🛡️  HACKATHON PARTICIPA DF - AUDITORIA LGPD\n")
-    cat("==============================================================\n")
-    cat("\033[0m") # Reseta cor
-    cat("👋 O ambiente foi configurado via 'renv'.\n")
+    cat("\n================================================================================\n")
+    cat("  1º HACKATHON EM CONTROLE SOCIAL: DESAFIO PARTICIPA DF - ACESSO À INFORMAÇÃO\n") 
+    cat("================================================================================\n")
+    cat("\033[0m") # Volta para a cor automática
+    cat("- O ambiente foi configurado via 'renv'.\n")
     
     # Tenta usar a API do RStudio para abrir o arquivo de forma limpa
-    # Se não tiver a API, ele NÃO TENTA abrir com file.edit (evita a janela feia)
     if (requireNamespace("rstudioapi", quietly = TRUE)) {
-      cat("👉 O script principal foi aberto para você.\n\n")
+      cat("- O script principal 'run.R' foi aberto para você.\n\n")
+      cat("INSTRUÇÕES DE EXECUÇÃO:\n")
+      cat("📂 1. Verifique se o arquivo .xlsx com textos a serem classificados está na pasta: 'dados/entrada'\n")
+      cat("▶️  2. Para rodar, clique no botão 'Source' (acima à direita) ou use o atalho:\n")
+      cat("      [ Ctrl + Shift + S ]\n\n")
       rstudioapi::navigateToFile("run.R")
     } else {
-      cat("👉 Por favor, abra o arquivo 'main.R' no painel de arquivos.\n\n")
+      cat("INSTRUÇÕES DE EXECUÇÃO:\n")
+      cat("📂 1. Verifique se o arquivo .xlsx com textos a serem classificados está na pasta: 'dados/entrada'\n")
+      cat("▶️  2. Abra o script 'run.R' e execute-o. Clique no botão 'Source' (acima à direita) ou use o atalho:\n")
+      cat("      [ Ctrl + Shift + S ]\n\n")
     }
   }
 }, action = "append")

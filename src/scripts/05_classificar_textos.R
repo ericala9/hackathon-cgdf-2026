@@ -267,13 +267,6 @@ saveWorkbook(wb, paste0("dados/saida/",
                         "_classificado.xlsx"), 
              overwrite = TRUE)
 
-message(paste0("Arquivo com textos classificados salvo em: ", 
-               getwd(),
-               "/dados/saida/", 
-               file_path_sans_ext(arquivo_textos), 
-               "_classificado.xlsx")
-)
-
 # ----------------------------------- Output -----------------------------------
 #
 # Arquivo criado:

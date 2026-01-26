@@ -1,61 +1,94 @@
 # ==============================================================================
-# 1º HACKATHON EM CONTROLE SOCIAL: DESAFIO PARTICIPA DF
+#  1º HACKATHON EM CONTROLE SOCIAL: DESAFIO PARTICIPA DF - ACESSO À INFORMAÇÃO 
 # ==============================================================================
-# ORQUESTRADOR PRINCIPAL (run.R)
+# Script: run.R
+# Objetivo: Executa a solução classificação de textos do desafio de Acesso à
+# Informação
+# Data: 2026-01
 # ==============================================================================
-# Este script executa todo o pipeline da solução, desde a preparação das bases
-# de conhecimento (nomes) até a classificação final dos textos.
+
 # ==============================================================================
+# INSTRUÇÕES: Salve o arquivo em formato .xlsx com os textos a serem
+# classificados na pasta dados/entrada.
+# ==============================================================================
+
+# ---------------------------- Configuração inicial ----------------------------
 
 # Limpa o ambiente para garantir uma execução estéril
 rm(list = ls())
-# cat("\014") # Limpa o console
 
-# Inicia cronômetro global
-cronometro_inicio <- Sys.time()
-
-# Função auxiliar para logs bonitos
-imprimir_etapa <- function(titulo) {
-  cat("\n")
-  cat(paste0(strrep("=", 80), "\n"))
-  cat(paste0("🚀 EXECUTANDO: ", titulo, "\n"))
-  cat(paste0(strrep("=", 80), "\n"))
+# Função auxiliar para mensagens de status com timestamp
+log_status <- function(mensagem) {
+  cat(sprintf("[%s] %s\n", format(Sys.time(), "%H:%M:%S"), mensagem))
+  flush.console() # Força a exibição imediata no console
 }
 
-# Verifica diretórios essenciais
+cat("\n")
+log_status(">>> INICIANDO...")
+log_status("1/5 - Carregamento de  bibliotecas e configuração do ambiente...")
+
+# Toda configuração de ambiente e pacotes a serem utilizados estão salvos no
+# script 00_requirements.R.
+suppressWarnings(
+  suppressPackageStartupMessages(
+    source("src/scripts/00_requirements.R", encoding = "UTF-8", echo = FALSE)))
+
+# Verificação de diretórios essenciais
 if (!dir.exists("dados/entrada")) dir.create("dados/entrada", recursive = TRUE)
 if (!dir.exists("dados/saida")) dir.create("dados/saida", recursive = TRUE)
 if (!dir.exists("dados/processado")) dir.create("dados/processado", recursive = TRUE)
 
-# ==============================================================================
-# ETAPA 1: CONSTRUÇÃO DAS BASES DE CONHECIMENTO (NOMES)
-# ==============================================================================
-# Nota: Estes scripts geram os arquivos .rds em dados/processado/
 
-imprimir_etapa("01_download_nomes_ibge.R (Download Censo)")
-# source("src/scripts/01_download_nomes_ibge.R", encoding = "UTF-8", echo = FALSE)
 
-imprimir_etapa("02_criar_base_nomes_ibge.R (Processamento IBGE)")
-# source("src/scripts/02_criar_base_nomes_ibge.R", encoding = "UTF-8", echo = FALSE)
+# TRAVA DE SEGURANÇA: Verifica se há arquivo de entrada para processar
+log_status("2/5 - Verificação do arquivo de entrada...")
+arquivos_entrada <- list.files("dados/entrada", pattern = "\\.(xlsx)$", full.names = TRUE)
 
-imprimir_etapa("03_criar_base_nomes_transparencia_df.R (Nomes Servidores DF)")
-# source("src/scripts/03_criar_base_nomes_transparencia_df.R", encoding = "UTF-8", echo = FALSE)
+if (length(arquivos_entrada) == 0) {
+  cat("\n\033[1;31m[ERRO] Nenhum arquivo .xlsx encontrado na pasta 'dados/entrada'!\033[0m\n")
+  cat("Por favor, coloque o arquivo .xlsx a ser classificado na pasta 'dados/entrada' e tente novamente.\n")
+  stop("Execução interrompida por falta de dados.")
+}
 
-# ==============================================================================
-# ETAPA 2: CLASSIFICAÇÃO DOS DOCUMENTOS (O MOTOR)
-# ==============================================================================
+log_status(sprintf("     Arquivo detectado: %s", basename(arquivos_entrada[1])))
 
-imprimir_etapa("05_classificar_textos.R (Auditoria e Classificação)")
-source("src/scripts/05_classificar_textos.R", encoding = "UTF-8", echo = FALSE)
+# Início do cronômetro
+cronometro_inicio <- Sys.time()
 
-# ==============================================================================
-# RESUMO FINAL
-# ==============================================================================
+# -------------------------- Classificação dos textos --------------------------
+
+# Os scripts 01 a 04 são auxiliares à solução. Os dados derivados deles e
+# necessários à solução estão salvos na pasta dados/processado, por isto estes
+# scripts não são utilizados para rodar a solução final de classificação.
+
+log_status("3/5 - Carregando bases de conhecimento e regras de expressões regulares...")
+# Esta etapa ocorre dentro do script 05, mas é avisada aqui para que o usuário
+# entenda o que vai ocorrer.
+
+log_status("4/5 - INÍCIO DA CLASSIFICAÇÃO...")
+cat("      (Esta etapa pode levar alguns minutos dependendo do volume de dados...)\n")
+flush.console()
+
+suppressWarnings(
+  suppressPackageStartupMessages(source("src/scripts/05_classificar_textos.R", encoding = "UTF-8", echo = FALSE)))
+
+log_status("5/5 - FIM DA CLASSIFICAÇÃO.")
+
+# Stop no cronômetro.
 cronometro_fim <- Sys.time()
 tempo_total <- round(difftime(cronometro_fim, cronometro_inicio, units = "mins"), 1)
 
 cat("\n")
-cat("########################################################################\n")
-cat(sprintf("✅  PIPELINE CONCLUÍDO COM SUCESSO!\n"))
-cat(sprintf("⏱️   Tempo Total de Execução: %s minutos\n", tempo_total))
-cat("########################################################################\n")
+cat("================================================================================\n")
+cat(sprintf("                         SOLUÇÃO FINALIZADA COM SUCESSO!\n"))
+cat(sprintf("Tempo total de execução: %.1f minutos\n", tempo_total))
+cat(sprintf(paste0("Arquivo final: dados/saida/", file_path_sans_ext(basename(arquivos_entrada[1])), "_classificado.xlsx\n")))
+cat("================================================================================\n")
+
+# ----------------------------------- Output -----------------------------------
+#
+# Arquivo criado:
+#                    dados/saida/[[NOME_ORIGINAL_DO_ARQUIVO]]_classificado.xlsx
+#
+# ------------------------------------------------------------------------------
+
