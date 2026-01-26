@@ -1,9 +1,16 @@
 source("renv/activate.R")
 
 # Configuração de espelho do CRAN 
-# Para não dar conflito de versão, é utilizado o servidor da POsit. Por isso a
+# Para não dar conflito de versão, é utilizado o servidor da Posit. Por isso a
 # solução só roda em Windows.
 options(repos = c(CRAN = "https://packagemanager.posit.co/cran/latest"))
+
+# Iimpede que o R tente usar 'gcc' ou 'make'. Se ele não achar o binário, ele
+# vai avisar, mas não vai tentar compilar e travar.
+options(pkgType = "binary")
+
+# Aumenta o tempo limite de download
+options(timeout = 300)
 
 setHook("rstudio.sessionInit", function(newSession) {
   
