@@ -14,9 +14,13 @@ Embora a identificação de um CPF, e-mail ou telefone seja uma tarefa simples p
 
 Se é simples para um humano reconhecer esses padrões, também é possível ensinar uma máquina a fazer o mesmo, com o benefício que estas não se cansam. No entanto, diantes de tantos modelos possíveis, como escolher qual é o melhor? Como bem lembrado pelo estatístico George Box (1976):
 
-*"Since all models are wrong the scientist must be alert to what is importantly wrong. It is inappropriate to be concerned about mice when there are tigers abroad."* (Tradução livre: "Como todos os modelos estão errados, o cientista deve estar alerta ao que está 'importantemente' errado. Não faz sentido se preocupar com ratos quando há tigres à solta.")
+> *"Since all models are wrong the scientist must be alert to what is importantly wrong. It is inappropriate to be concerned about mice when there are tigers abroad."* (Tradução livre: "Como todos os modelos estão errados, o cientista deve estar alerta ao que está 'importantemente' errado. Não faz sentido se preocupar com ratos quando há tigres à solta.")
 
-![Filosofia Tigres vs Ratos](img/tigre_01.png) *(Fig. 1: É melhor prender alguns ratos por engano do que deixar um tigre solto na rua.)*
+<p align="center">
+  <img src="./img/tigre_01.png" alt="Pessoas se preocupadas com ratos quando tem um grupo de tigres logo atrás delas" width="600px">
+</p>
+
+<p align="center"><em><strong>"Não faz sentido se preocupar com ratos quando há tigres à solta."</strong></em></p>
 
 Partindo do pressuposto que todos os modelos estão errados, nem todo erro tem o mesmo peso prático. Para o contexto desta solução, temos:
 
