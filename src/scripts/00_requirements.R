@@ -2,9 +2,8 @@
 #  1º HACKATHON EM CONTROLE SOCIAL: DESAFIO PARTICIPA DF - ACESSO À INFORMAÇÃO 
 # ==============================================================================
 # Script: src/scripts/00_requirements.R
-# Objetivo: Restaurar o ambiente do projeto de forma robusta.
-# Estratégia: Tenta usar renv::restore(). Se falhar (erro de rede/sistema),
-# muda automaticamente para instalação direta 
+# Objetivo: Restaurar o ambiente do projeto. Primeira tentativa via
+# renv::restore(). Se falhar, tenta automaticamente por instalação direta. 
 # Data: 2026-01
 # ==============================================================================
 
@@ -54,6 +53,9 @@ if (!sucesso_renv) {
 # ------------------------------------------------------------------------------
 #                                 Próximo passo 
 # ------------------------------------------------------------------------------
-# A) Para avaliação da solução (Execução Principal):
+# A) Para avaliação da solução:
 #     src/scripts/05_classificar_textos.R
+#
+# B) Para reconstrução completa do projeto:
+#     src/scripts/01_download_nomes_ibge.R
 # ------------------------------------------------------------------------------
