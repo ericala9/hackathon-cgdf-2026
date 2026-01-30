@@ -93,10 +93,12 @@ Se houver necessidade de apontar arquivos específicos.
 (Atende ao critério: Instruções de Execução - item b )
 
 ### Formato de Entrada
-Descrição da planilha Excel esperada (colunas, formato).
+Arquivo em formato .xlsx, a ser salvo na pasta dados/entrada. 
+Será lida a primeira planilha do arquivo, que pode ter quaisquer números de colunas, a solução foi desenhada para identificar qual a coluna que apresenta o texto com solicitação de acesso à informmação.
 
 ### Formato de Saída
-Descrição exata do arquivo gerado (colunas "ID" e "Classificacao", formato .xlsx ou .csv conforme sua entrega).
+Arquivo em formato .xlsx, a ser salvo na pasta dados/saida. 
+O arquivo é uma cópia exata do arquivo de entrada, com o acréscimo da coluna "Classificacao", que terá os valores "Público" e "Não público".
 
 ##  Estrutura do Projeto (Arquitetura de Arquivos)
 
@@ -108,12 +110,10 @@ Diagrama ou lista das pastas (data/, src/, output/).
 ### Dicionário de Arquivos
 Explicação breve da função de cada script importante (ex: 01_limpeza.R - normaliza texto; 02_classifica.R - aplica regex).
 
-##  Declaração de Uso de Inteligência Artificial
+##  Uso de Inteligência Artificial
 
-(Atende ao critério: Disposições Gerais - item 13.9 )
+O desenvolvimento desta solução utilizou o Google Gemini 3. Este atuou como assistente de programação para a otimização de sintaxe de expressões regulares, depuração de scripts em R e estruturação da documentação técnica, além de auxílio para a confecção das ilustrações deste documento. Ressalta-se que a IA foi utilizada apenas na etapa de desenvolvimento; o código final entregue é determinístico e não realiza chamadas externas a modelos de IA.
 
-### Modelos/Ferramentas
-Indicação clara se usou LLMs para auxílio no código ou lógica.
+## Contato
 
-### Bibliotecas e Fontes
-Citação das fontes utilizadas (se aplicável).
+Pode me contatar aqui pelo GitHub mesmo, e, se já nos conhecemos, pode me procurar para falar o que achou da solução. Como falei, já estou planejando a versão 2.0 e sugestões são bem-vindas.
