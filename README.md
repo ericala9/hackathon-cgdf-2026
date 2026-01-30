@@ -30,11 +30,17 @@ Existem tantas maneiras possíveis de ensinar uma ensinar uma máquina a reconhe
 Partindo da ideia que todos os modelos estão errados, os erros podem ter o mesmo peso no edital, mas nem todo erro tem o mesmo peso prático. Para o contexto desta solução, temos:
 
 -   **Os Tigres** (falsos negativos): São os dados pessoais reais (CPF, nome, endereço, e-mail) que o modelo deixa passar. Um "tigre" solto pode causar muito dano, pois viola a LGPD e expõe o cidadão a riscos reais.
--   **Os Ratos** (falsos positivos): São sequências, a princípio, inofensivas (número de Lei, Protocolo, CNPJ) que o modelo confunde com dados pessoais. Eles são incômodos, mas são mais fáceis de controlar a longo prazo e não são o foco emergencial, pois o potencial de causar dano é menor.
+-   **Os Ratos** (falsos positivos): São sequências, a princípio, inofensivas (número de Lei, Protocolo, processo SEI) que o modelo confunde com dados pessoais. Eles são incômodos, mas são mais fáceis de controlar a longo prazo e não são o foco emergencial, pois o potencial de causar dano é menor.
 
 Desta maneira, foi a prioridade desta solução foi capturar o maior número possível de "tigres". Para tal, foi utilizada uma abordagem determinística, com análise de contexto e expressões regulares intencionalmente menos restritivas, e sem validação de valores, para capturar até mesmo dados digitados com erro. Como resultado, um pequeno número de "ratos" é capturado junto com os "tigres". Esta solução não envolve *machine learning* e/ou inteligência artificial, por conta do tempo necessário para treinar e ajustar modelos para este contexto, e a incerteza quanto ao tipo de hardware disponível para a avaliação da solução final. A solução encontrada se mostrou satisfatória o bastante, de tal maneira que os ganhos que seria obtidos ao se acrescentar métodos probabilísticos seriam decrescentes neste momento. Isto não quer dizer que não existem planos de uma nova versão dessa solução com a integração de modelos proabilísiticos. Decidiu-se por se desenhar uma solução em R, onde os pacotes apresentam retrocompatibilidade e existem opções como `renv` que permite de maneira simples que o ambiente onde a solução foi desenhada seja reproduzido de maneira simples em outras máquinas. Nesta solução deterministística é possível saber em que ponto ela falhou, e isto contribui para a melhoria contínua da mesma.
 
 Os parágrafos abaixo trazem, de forma resumida, a estratégia desenhada para esta solução. Mais detalhes podem ser encontrados nos comentários das funções funções escritas para cada uma das regras. Os links de cada uma estão ao final do parágrafo de cada regra. As regras foram combinadas de tal maneira a serem todas chamadas para execução do [05_classificar_textos.R](script src/scripts/05_classificar_textos.R).
+
+<p align="center">
+  <img src="./img/tigre_02_03.png" alt="Dois tigres e um rato dentro de uma gaiola e alguns ratos fora da gaiola; pessoas passeando felizes enquanto há um único tigre à espreita." width="600px">
+</p>
+
+<p align="center"><em><strong>Às vezes ratos são capturados junto com os tigres, e podem persistir alguns tigres solitários</strong></em></p>
 
 Dois princípios guiaram a solução: o do queijo suíço e do curto-circuito. O princípio do queijo suíço faz com que as várias camadas de diferentes regras capturem dados pessoais que não seriam capturados caso apenas uma regra estivesse em vigor. Seguindo na ilustração dos tigres, se um tigre é visto numa região, não é necessário encontrar todos os tigres que estão ali para declarar que existem tigres naquela localidade. De modo similar, para a classificação de textos de solicitação de acesso à informação em público e não público, é aplicado o princípio do curto-circuito, que contribui para a otimização de performance computacional: o texto é prontamente classificado ao se encontrar um dado pessoal e a análise dele é finalizada naquele momento, não importando quantas regras ainda poderiam ser aplicadas. 
 
@@ -44,17 +50,9 @@ Regras de expressões regulares foram combinadas com gatilhos para a detecção 
 
 A detecção de nomes em comparação de trechos do texto com listas de nomes a partir gatilhos que podem levar a nomes, como "meu nome é", e "me chamo", e a varredura das palavras finais do texto, onde os cidadãos costumam escrever seus nomes completos para assinar a solicitação. As listas de nome foram construídas com base na lista de nomes e sobrenomes coletados no Censo 2022 do IBGE (script de [download](src/scripts/01_download_nomes_ibge.R) e [tratamento](src/scripts/02_criar_base_nomes_ibge.R)), e nos nomes e sobrenomes dos servidores do Distrito Federal presentes no Portal da Transparência em janeiro de 2026 ([script](src/scripts/03_criar_base_nomes_transparencia_df.R)). Estas listas foram salvas na pasta [dados/processado](dados/processado) deste repositório, e, para o bom desempenho da solução final, são lidas apenas as listas, e não há a reconstrução total delas. O repositório traz os scripts necessários para a reconstrução destas com todos os passos e tratamentos que foram feitos. Tal abordagem com as listas de nomes e sobrenomes do Censo 2022 e do Portal da Transparência do Distrito Federal permite com que nomes relativamente raros sejam detectados por esta solução. Script: [detectar_nomes.R](src/utils/detectar_nomes.R)
 
-<p align="center">
-  <img src="./img/tigre_02_03.png" alt="Pessoas se preocupam com ratos quando tem um grupo de tigres logo atrás delas" width="600px">
-</p>
-
-<p align="center"><em><strong>Às vezes ratos são capturados junto com os tigres, e podem persistir alguns tigres solitários"</strong></em></p>
-
 Por conta de sua complexidade do assunto, não foram elaboradas regras para a detecção de endereços sem CEP. Como a proposta desenhada não envolve a utilização de *machine learning*, não seria possível detectar endereços completos sem essa ferramenta. Além disso, mesmo com a utilização de modelos de *machine learning*, gastaria-se muito tempo refinando o modelo para que ele evitasse confudir a mera citação de um endereço ("moro na QL 35") de a declaração de um endeço completo ("moro na QL 35 conjunto 14 casa 6"). Endereços sem CEP são "tigres" que esta solução não consegue capturar. Mas estes "tigres" não costumam andar sozinhos. Na análise exploratória feita nas solicitações disponíveis no FalaBR, Ceará Transparente e Dados Abertos do Espírito Santo, além do teste de estresse com a solução final feita com as solicitações do FalaBR, foi possível ver que não é comum o endereço ser o único dado pessoal declarado numa solicitação de análise de dados. As outras camadas de detecção de dados pessoais permitem com que o texto tenha a classificação correta e o "tigre" do endereço sem CEP seja encontrado.
 
-Falar sobre datas de nascimento, e o mascaramento (escondendo ratos que parecem tigres).
-
-Breve resumo da estratégia (ex: "Utilização de Regex e dicionários em R para maximizar recall e garantir execução em ambiente offline").
+Para evitar que dados como número de processos e protocolos, números de leis e afins sejam confundidos com dados pessoais, foi feita uma verificação na vizinhança de termos que levam à estas numerações. Se encontradas, estas eram prontamente mascaradas, ou, na narrativa utilizada neste documento, ratos muito parecidos com tigres eram escondidos. Script: [05_classificar_textos.R](script src/scripts/05_classificar_textos.R).
 
 ## Pré-requisitos do Sistema
 
