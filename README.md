@@ -83,7 +83,7 @@ Windows 11
 ## Configuração do ambiente
 
 ### Gerenciador de pacotes
-O arquivo [`00_requirements.R`](src/scripts/00_requirements.R) permite que os pacotes sejam instalados automaticamente, seja por meio do `renv`, ou, caso ocorra alguma falha na restauração do ambiente, o script acionará um método de contingência que instala automaticamente os pacotes, tendo como fonte o repositório da Posit.
+O arquivo [`00_requirements.R`](src/scripts/00_requirements.R) permite que os pacotes sejam instalados automaticamente, seja por meio do `renv`, ou, caso ocorra alguma falha na restauração do ambiente, o script acionará um método de contingência que instala os pacotes, tendo como fonte o repositório da Posit.
 
 
 ### Passo a passo de instalação
