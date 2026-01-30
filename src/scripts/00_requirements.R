@@ -9,13 +9,27 @@
 
 # ------------------------- Instalação de dependências -------------------------
 
+# Para não perguntar se pode instalar os pacotes.
+options(pkgType = "binary")
+options(install.packages.compile.from.source = "never")
+options(ask = FALSE)
+Sys.setenv(RENV_CONFIG_SANDBOX_ENABLED = "FALSE")
+Sys.setenv(RENV_CONFIG_STARTUP_QUIET = "TRUE")
+
+
 if (!requireNamespace("renv", quietly = TRUE)) {
   install.packages("renv") 
 }
 
+if (packageVersion("renv") >= "0.12.0") {
+  renv::consent(provided = TRUE)
+}
+
+options(renv.consent = TRUE)
+
 ## Plano A - Instalação por meio do renv ---------------------------------------
 sucesso_renv <- tryCatch({
-  renv::restore(prompt = FALSE)
+  renv::restore(prompt = FALSE, clean = TRUE)
   TRUE 
 }, error = function(e) {
   return(FALSE)
