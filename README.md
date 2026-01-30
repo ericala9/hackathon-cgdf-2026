@@ -166,4 +166,4 @@ O desenvolvimento desta solução utilizou o Google Gemini 3. Este atuou como as
 
 ## Contato
 
-Pode me contatar aqui pelo GitHub, na aba Issues deste repositório, e, se já nos conhecemos, pode me procurar para falar o que achou da solução e trocarmos ideias sobre o assunto.
+Pode me contatar aqui pelo GitHub, na aba Issues deste repositório. Se já nos conhecemos, pode me procurar para falar o que achou da solução e trocarmos ideias sobre o assunto.
