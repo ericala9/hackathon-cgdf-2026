@@ -7,8 +7,6 @@ Solução do 1º Hackathon em Controle Social: Desafio Participa DF - Acesso à 
 ----
 ## Sumário
 - [Sobre a solução](#sobre-a-solução)
-  - [Objetivo](#objetivo)
-  - [Abordagem técnica](#abordagem-técnica)
 - [Pré-requisitos do sistema](#pré-requisitos-do-sistema)
 - [Configuração do ambiente](#configuração-do-ambiente)
 - [Guia de execução](#guia-de-execução)
