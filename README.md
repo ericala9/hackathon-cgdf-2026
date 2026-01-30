@@ -4,27 +4,110 @@ Solução do 1º Hackathon em Controle Social: Desafio Participa DF - Acesso à 
 
 ![Status](https://img.shields.io/badge/Status-Stable-green) ![Language](https://img.shields.io/badge/Language-R-blue) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-------------------------------------------------------------------------
+----
 
 ## Sobre a solução
 
-Conforme disposto no item 2.2 do edital, o desafio consiste em classificar **automaticamente** solicitações que contenham dados pessoais.
+### Objetivo do Projeto
+Conforme disposto no item 2.2 do edital, o desafio consiste em classificar automaticamente solicitações que contenham dados pessoais. As campanhas de conscientização da CGDF sobre o Participa DF incluem instruções de boas práticas sobre a não inclusão de dados pessoais na solicitação de acesso à informação, como pode ser visto no [Video passo a passo para fazer seu pedido de acesso à informação](https://youtu.be/6pBADErxS-4?si=nbB-hph2b0uAZHzn) da @TVCONTROLADORIADF no YouTube. Apesar disso, a realidade do servidor que recebe e responde estas solicitações, tarefa que desempenho ocasionalmente, confirma que a inclusão de dados pessoais nos pedidos de acesso à informação acontece com frequência.
 
-Embora a identificação de um CPF, e-mail ou telefone seja uma tarefa simples para um ser humano, a execução repetitiva esbarra em um inimigo silencioso: a fadiga. O cansaço gera inconsistência, e a inconsistência gera riscos, seja o risco de expor um dado dados pessoais ou de ocultar uma informação que deveria ser pública.
+Um dos passos da solução, que será tratado em mais detalhes adiante, foi a análise exploratória de solicitações de acesso à informação disponíveis no [FalaBR](https://buscalai.cgu.gov.br/DownloadDados/DownloadDados), [Ceará Transparente](https://cearatransparente.ce.gov.br/portal-da-transparencia/manifestacoes-e-solicitacoes-publicas?__=__) e [Dados Abertos do Espírito Santo](https://dados.es.gov.br/dataset/pedidos-de-informacoes). No início da análise, eram só muitos Josés, Marias, Paulos e Anas que compartilharam seus dados e nomes nas solicitações. O desafio se tornou real quando foi encontrada, de forma completamente aleatória, uma solicitação feita por uma pessoa que conheço. Nesta solicitação estava o nome completo dela e onde trabalhava. Não tinha conhecimento desta última informação, até ler aquela solicitação. Quando a situação foi compartilhada com a pessoa, e ela disse, entre risadas: "Pois é, minhas informações estão disponíveis na internet e meu pedido ainda foi indeferido."
 
-Se é simples para um humano reconhecer esses padrões, também é possível ensinar uma máquina a fazer o mesmo, com o benefício que estas não se cansam. No entanto, diantes de tantos modelos possíveis, como escolher qual é o melhor? Como bem lembrado pelo estatístico George Box (1976):
+Embora a identificação de um CPF, e-mail ou telefone seja uma tarefa simples para um ser humano, a execução repetitiva esbarra em um inimigo silencioso: a fadiga. O cansaço gera inconsistência, e a inconsistência gera riscos, seja o risco de expor um dado dados pessoais ou de ocultar uma informação que deveria ser pública. Se é simples para um humano reconhecer esses padrões, também é possível ensinar uma máquina a fazer o mesmo, com o benefício que estas não se cansam. E neste ponto surge a pergunta: como ensinar uma máquina a reconhecer dados pessoais?
+
+
+### Abordagem Técnica
+Existem tantas maneiras possíveis de ensinar uma ensinar uma máquina a reconhecer dados pessoais que testar todas elas para apresentar apenas a melhor solução gastaria um tempo que não está disponível para o escopo deste desafio. A frase utilizada como norte ao ao se decidir o que fazer é do estatístico George Box (1976):
 
 > *"Since all models are wrong the scientist must be alert to what is importantly wrong. It is inappropriate to be concerned about mice when there are tigers abroad."* (Tradução livre: "Como todos os modelos estão errados, o cientista deve estar alerta ao que está 'importantemente' errado. Não faz sentido se preocupar com ratos quando há tigres à solta.")
 
 <p align="center">
-  <img src="./img/tigre_01.png" alt="Pessoas se preocupadas com ratos quando tem um grupo de tigres logo atrás delas" width="600px">
+  <img src="./img/tigre_01.png" alt="Pessoas se preocupam com ratos quando tem um grupo de tigres logo atrás delas" width="600px">
 </p>
 
 <p align="center"><em><strong>"Não faz sentido se preocupar com ratos quando há tigres à solta."</strong></em></p>
 
-Partindo do pressuposto que todos os modelos estão errados, nem todo erro tem o mesmo peso prático. Para o contexto desta solução, temos:
+Partindo da ideia que todos os modelos estão errados, os erros podem ter o mesmo peso no edital, mas nem todo erro tem o mesmo peso prático. Para o contexto desta solução, temos:
 
--   **Os Tigres (Falsos Negativos):** São os dados pessoais reais (CPF, nome, endereço, e-mail) que o modelo deixa passar. Um "tigre" solto pode causar muito dano, pois viola a LGPD e expõe o cidadão a riscos reais.
--   **Os Ratos (Falsos Positivos):** São sequências, a princípio, inofensivas (número de Lei, Protocolo, CNPJ) que o modelo confunde com dados pessoais. Eles são incômodos, mas são mais fáceis de controlar a longo prazo e não são o foco emergencial, pois o potencial de causar dano é menor.
+-   **Os Tigres** (falsos negativos): São os dados pessoais reais (CPF, nome, endereço, e-mail) que o modelo deixa passar. Um "tigre" solto pode causar muito dano, pois viola a LGPD e expõe o cidadão a riscos reais.
+-   **Os Ratos** (falsos positivos): São sequências, a princípio, inofensivas (número de Lei, Protocolo, CNPJ) que o modelo confunde com dados pessoais. Eles são incômodos, mas são mais fáceis de controlar a longo prazo e não são o foco emergencial, pois o potencial de causar dano é menor.
 
-Desta maneira, foi a prioridade desta solução foi capturar o maior número possível de "tigres", isto é recall máximo. Para tal, foi utilizada uma abordagem determinística, com análise de contexto e expressões regulares intencionalmente menos restritivas, e sem validação de valores, para capturar até mesmo dados digitados com erro. Como resultado, um pequeno número de "ratos" é captuado junto com os "tigres".
+Desta maneira, foi a prioridade desta solução foi capturar o maior número possível de "tigres". Para tal, foi utilizada uma abordagem determinística, com análise de contexto e expressões regulares intencionalmente menos restritivas, e sem validação de valores, para capturar até mesmo dados digitados com erro. Como resultado, um pequeno número de "ratos" é capturado junto com os "tigres". Esta solução não envolve *machine learning* e/ou inteligência artifical, por conta do tempo necessário para treinar modelos neste para este contexto, e a incerteza quanto ao tipo de hardware disponível para a avaliação da solução final. Além disso, decidiu-se por se desenhar uma solução R, onde os pacotes apresentam retrocompatibilidade e existem opções como `renv` que permite de maneira simples que o ambiente onde a solução foi desenhada seja reproduzido de maneira simples em outras máquinas. Nesta solução determinista é possível saber em que ponto ela falhou, e isto contribui para a melhoria contínua da mesma.
+
+Os parágrafos abaixo trazem, de forma resumida, a estratégia desenhada para esta solução. Mais detalhes podem ser encontrados nos comentários das funções funções escritas para cada uma das regras. Os links de cada uma estão ao final do parágrafo de cada regra. 
+
+Dois princípios guiaram a solução: o do queijo suíço e do curto-circuito. O princípio do queijo suíço faz com que as várias camadas de diferentes regras capurem dados pessoais que não seria capturados caso apenas uma regra estivesse em vigor. Seguindo na ilustração dos tigres, se um tigre é visto numa região, não é necessário encontrar todos os tigres que estão ali para declarar que existem tigres ali. De modo similar, para a classificação de textos de solicitação de acesso à informação em público e não público, é aplicado o princípio do curto-circuito, que contribui para a otimização de performance computacional: o texto é prontamente classificado ao se encontrar um dado pessoal e a análise dele é finalizada naquele momento, não importando quantas regras ainda poderiam ser aplicadas. 
+
+Expressões regulares foram utilizadas para detectar no texto da solicitação a ocorrência de e-mails, CEP, CPF e números de celulares.  Os resultados não foram validados, como a conferência se os telefones estão no formato permitido pela legislação, como, por exemplo, celulares com nono dígito "9" ou a validação dos dígitos verificadores do CPF. A regra para captura de e-mails permite erros simples de digitação, como "gmail,com".
+
+Regras de expressões regulares foram combinadas com gatilhos para a detecção de outros documentos, como RG, título de eleitor, matrícula, OAB e inscrição das principais entidades de classe, passaporte, carteira de trabalho, Cartão Nacional de Saúde, data de nascimento, e informações bancárias e números de inscrição em geral. A regra utilizada para este caso foi de buscar a presença de quatro dígitos, com separadores ou não, na vizinha imediata do texto próximo a gatilhos de texto referentes à estas informações. 
+
+A detecção de nomes em comparação de trechos do texto com listas de nomes a partir gatilhos que podem levar a nomes, como "meu nome é", e "me chamo", e a varredura das palavras finais do texto, onde os cidadãos costumam escrever seus nomes completos para assinar a solicitação. As listas de nome foram construídas com base na lista de nomes e sobrenomes coletados no Censo 2022 do IBGE (script de [download](src/scripts/01_download_nomes_ibge.R) e [tratamento](src/scripts/02_criar_base_nomes_ibge.R)), e nos nomes e sobrenomes dos servidores do Distrito Federal presentes no Portal da Transparência em janeiro de 2026 ([script](src/scripts/03_criar_base_nomes_transparencia_df.R)). Estas listas foram salvas na pasta [dados/processado](dados/processado) deste repositório, e, para o bom desempenho da solução final, são lidas apenas as listas, e não há a reconstrução total delas. O repositório traz os scripts necessários para a reconstrução destas com todos os passos e tratamentos que foram feitos. Tal abordagem com as listas de nomes e sobrenomes do Censo 2022 e do Portal da Transparência do Distrito Federal permite com que nomes relativamente raros sejam detectados por esta solução.
+
+Por conta de sua complexidade, não foram elaboradas regras para a detecção de endereços sem CEP. Como a proposta desenhada não envolve a utilização de *machine learning*, não seria possível detectar endereços completos sem essa ferramenta. Além disso, mesmo com a utilização de modelos de *machine learning*, gastaria-se muito tempo refinando o modelo para que ele evitasse confudir a mera citação de um endereço ("moro na QL 35") de a declaração de um endeço completo ("moro na QL 35 conjunto 14 casa 6"). Endereços sem CEP são "tigres" que esta solução não consegue capturar. Mas estes "tigres" não costumam andar sozinhos. Na análise exploratória feita nas solicitações disponíveis no FalaBR, Ceará Transparente e Dados Abertos do Espírito Santo, além do teste de estresse com a solução final feita com as solicitações do FalaBR, foi possível ver que não é comum o endereço ser o único dado pessoal declarado numa solicitação de análise de dados. As outras camadas de detecção de dados pessoais permitem com que o texto tenha a classificação correta e o "tigre" do endereço sem CEP seja encontrado.
+
+Falar sobre datas de nascimento, e o mascaramento (escondendo ratos que parecem tigres).
+
+Breve resumo da estratégia (ex: "Utilização de Regex e dicionários em R para maximizar recall e garantir execução em ambiente offline").
+
+## Pré-requisitos do Sistema
+
+### Versão da Linguagem: 
+R versão 4.1 ou superior - [download](https://vps.fmvz.usp.br/CRAN/)
+
+### Softwares Necessários
+RStudio Desktop versão 2023.06 ou superior - [download](https://posit.co/download/rstudio-desktop/)
+
+### Sistema Operacional
+Windows 11
+
+*Nota: Embora a solução tenha sido escrita puramente em código R e possa ser executada em qualquer ambiente (VS Code, Terminal, Jupyter) e qualquer sistema operacional, o caminho da solução final para avaliação no Hackathon foi otimizado para a experiência "One-Click" do RStudio. Aos que desejam reconstruir a solução do zero, podem utilizar o ambiente e sistema operacional de sua escolha.*
+
+## Gestão de Dependências e Instalação
+
+### Gerenciador de Pacotes
+Os pacotes são instalados automaticamente 
+Menção explícita ao uso do renv para reprodutibilidade.
+
+### Passo a Passo de Instalação
+Comandos sequenciais para restaurar o ambiente (ex: renv::restore()).
+
+## Guia de Execução (Pipeline)
+
+(Atende ao critério: Instruções de Execução - item a )
+
+### Comando de Execução
+O comando exato para rodar o script principal (ex: source("run.R")).
+
+### Argumentos
+Se houver necessidade de apontar arquivos específicos.
+
+## Especificação de Dados (Entrada e Saída)
+
+(Atende ao critério: Instruções de Execução - item b )
+
+### Formato de Entrada
+Descrição da planilha Excel esperada (colunas, formato).
+
+### Formato de Saída
+Descrição exata do arquivo gerado (colunas "ID" e "Classificacao", formato .xlsx ou .csv conforme sua entrega).
+
+##  Estrutura do Projeto (Arquitetura de Arquivos)
+
+(Atende ao critério: Clareza e Organização - itens a e c )
+
+### Árvore de Diretórios
+Diagrama ou lista das pastas (data/, src/, output/).
+
+### Dicionário de Arquivos
+Explicação breve da função de cada script importante (ex: 01_limpeza.R - normaliza texto; 02_classifica.R - aplica regex).
+
+##  Declaração de Uso de Inteligência Artificial
+
+(Atende ao critério: Disposições Gerais - item 13.9 )
+
+### Modelos/Ferramentas
+Indicação clara se usou LLMs para auxílio no código ou lógica.
+
+### Bibliotecas e Fontes
+Citação das fontes utilizadas (se aplicável).
